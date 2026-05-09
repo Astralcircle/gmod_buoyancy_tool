@@ -7,7 +7,22 @@ TOOL.Information = {
 
 TOOL.ClientConVar["ratio"] = "0"
 
+local function SetBuoyancy(ply, ent, data)
+	local phys = ent:GetPhysicsObject()
+
+	if phys:IsValid() then
+		local ratio = math.Clamp(data.Ratio or 100, -1000, 1000) / 100
+		ent.BuoyancyRatio = ratio
+		phys:SetBuoyancyRatio(ratio)
+		phys:Wake()
+
+		duplicator.StoreEntityModifier(ent, "buoyancy", data)
+	end
+end
+
 if SERVER then
+	duplicator.RegisterEntityModifier("buoyancy", SetBuoyancy)
+	
 	local function RestoreBuoyancy(ply, ent)
 		local ratio = ent.BuoyancyRatio
 
@@ -32,23 +47,6 @@ else
 	language.Add("tool.buoyancy.left", "Apply buoyancy")
 	language.Add("tool.buoyancy.right", "Copy buoyancy")
 end
-
-local function SetBuoyancy(ply, ent, data)
-	local phys = ent:GetPhysicsObject()
-
-	if phys:IsValid() then
-		local ratio = math.Clamp(data.Ratio or 100, -1000, 1000) / 100
-		ent.BuoyancyRatio = ratio
-		phys:SetBuoyancyRatio(ratio)
-		phys:Wake()
-
-		duplicator.StoreEntityModifier(ent, "buoyancy", data)
-	end
-
-	return true
-end
-
-duplicator.RegisterEntityModifier("buoyancy", SetBuoyancy)
 
 function TOOL:LeftClick(trace)
 	local ent = trace.Entity
