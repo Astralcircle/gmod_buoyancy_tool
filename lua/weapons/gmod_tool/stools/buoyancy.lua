@@ -51,9 +51,10 @@ end
 function TOOL:LeftClick(trace)
 	local ent = trace.Entity
 	if not ent:IsValid() then return end
-	if CLIENT then return true end
 
-	SetBuoyancy(self:GetOwner(), ent, {Ratio = self:GetClientNumber("ratio")})
+	if SERVER then
+		SetBuoyancy(self:GetOwner(), ent, {Ratio = self:GetClientNumber("ratio")})
+	end
 
 	return true
 end
@@ -61,10 +62,11 @@ end
 function TOOL:RightClick(trace)
 	local ent = trace.Entity
 	if not ent:IsValid() then return end
-	if CLIENT then return true end
 
-	local phys = ent:GetPhysicsObject()
-	self:GetOwner():ConCommand("buoyancy_ratio " .. (phys:IsValid() and (ent.BuoyancyRatio or phys:GetBuoyancyRatio()) * 100))
+	if SERVER then
+		local phys = ent:GetPhysicsObject()
+		self:GetOwner():ConCommand("buoyancy_ratio " .. (phys:IsValid() and (ent.BuoyancyRatio or phys:GetBuoyancyRatio()) * 100))
+	end
 
 	return true
 end
